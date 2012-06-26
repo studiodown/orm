@@ -57,7 +57,6 @@ class BelongsTo extends Relation
 
 		foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition)
 		{
-			var_dump($condition);
 			if( 'from::' == substr ($condition[0], 0, 6)){
     			$condition[0] = substr ($condition[0], 6);
     			break;
