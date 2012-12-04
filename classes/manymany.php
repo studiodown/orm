@@ -109,6 +109,13 @@ class ManyMany extends Relation
 		foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition)
 		{
 			is_array($condition) or $condition = array($key, '=', $condition);
+			if( 'from::' == substr ($condition[0], 0, 6)){
+    			$condition[0] = substr ($condition[0], 6);
+			}else if( 'to::' == substr ($condition[0], 0, 4) ) {
+    			$condition[0] = substr ($condition[0], 4);
+			}else if( 'through::' == substr ($condition[0], 0, 9) ) {
+    			$condition[0] = 't0_through.'.substr ($condition[0], 9);
+			}
 			$query->where($condition);
 		}
 
@@ -190,9 +197,19 @@ class ManyMany extends Relation
 		foreach (\Arr::get($this->conditions, 'where', array()) as $key => $condition)
 		{
 			! is_array($condition) and $condition = array($key, '=', $condition);
+			$alias_tab = $alias_to;
+			if( 'from::' == substr ($condition[0], 0, 6)){
+    			$alias_tab = $alias_from;
+    			$condition[0] = substr ($condition[0], 6);
+			}else if( 'to::' == substr ($condition[0], 0, 4) ) {
+    			$condition[0] = substr ($condition[0], 4);
+			}else if( 'through::' == substr ($condition[0], 0, 9) ) {
+			    $alias_tab = $alias_to.'_through';
+    			$condition[0] = substr ($condition[0], 9);
+			}
 			if ( ! $condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false)
 			{
-				$condition[0] = $alias_to.'.'.$condition[0];
+				$condition[0] = $alias_tab.'.'.$condition[0];
 			}
 			is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
 
